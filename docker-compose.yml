@@ -1,8 +1,7 @@
-+version: "3.9"
+version: "3"
 
 services:
-  resume-app:
+  app:
     build: .
-    container_name: resume_project
     ports:
-      - "5000:5000"
+      - "8000:8000"
