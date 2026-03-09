@@ -99,4 +99,13 @@ def employeer_submit_data():
     #                        link_column="Link", zip=zip)
 
 if __name__ =="__main__":
-    app.run(use_reloader=False)
+    app.run(host="0.0.0.0", port=5000, use_reloader=False)
+
+    #docker run -p 5000:5000 resume-app
+
+
+    #if changes in file then use below command to run the app
+    #docker build -t resume-app .
+
+    #daily --> docker compose up
+    #if changes -->docker compose up --build
