@@ -1,0 +1,5 @@
+outs:
+- md5: 050f2008bfb53bc09189afdede5dd717
+  size: 15491613
+  hash: md5
+  path: best_job_title_classifier.joblib

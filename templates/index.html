@@ -20,8 +20,8 @@
         <nav>
             <ul class="navbar">
                 <li><a href="{{url_for('index')}}">Home</a></li>
-                <li><a href="{{url_for('employee')}}">Employee</a></li>
-                <li><a href="{{url_for('employeer')}}">Employeer</a></li>
+                <li><a href="{{url_for('employee')}}">Upload Resume</a></li>
+                <li><a href="{{url_for('employeer')}}">Job Recommendations</a></li>
             </ul>
         </nav>
         &nbsp; &nbsp;
@@ -42,31 +42,69 @@
             </div>
         </div>
     </section>
-    <section class="team">
-        <h1><span>Made with ❤</span></h1>
-        <div class="container">
-            <div class="card">
-                <div class="content">
-                    <div class="imgBx">
-                        <img src="{{ url_for('static',filename='img/Jainil.jpg') }}">
-                    </div>
-                    <div class="contentBx">
-                        <h4>Jainil Jakasaniya</h4>
-                        <h5>Backend Developer</h5>
+  <section class="team">
+    <h1><span>Team Members</span></h1>
 
-                    </div>
-                    <div class="sci">
-                        <a href="mailto:jainiljakasaniya@gmail.com"><i class="fa fa-envelope" aria-hidden="true"></i></a>
-                        <a href="https://www.linkedin.com/in/jainil-jakasaniya-6794b3203/"><i class="fa fa-linkedin" aria-hidden="true"></i></a>
-                        <a href="https://github.com/jainiljakasaniya"><i class="fa fa-github" aria-hidden="true"></i></a>
-                    </div>
+    <div class="container">
+
+        <!-- Card 1 -->
+       
+
+        <!-- Card 2 -->
+        <div class="card">
+            <div class="content">
+                <div class="imgBx">
+                    <img src="{{ url_for('static',filename='img/ishan.jpg') }}">
+                </div>
+                <div class="contentBx">
+                    <h4>Ishan Chapparwal</h4>
+                </div>
+                <div class="sci">
+                    <a href="#"><i class="fa fa-envelope"></i></a>
+                    <a href="#"><i class="fa fa-linkedin"></i></a>
+                    <a href="#"><i class="fa fa-github"></i></a>
                 </div>
             </div>
         </div>
-    </section>
+
+
+         <div class="card">
+            <div class="content">
+                <div class="imgBx">
+                    <img src="{{ url_for('static',filename='img/komal_photo.jpg') }}">
+                </div>
+                <div class="contentBx">
+                    <h4>Komal Salunke</h4>
+                </div>
+                <div class="sci">
+                    <a href="mailto:komalsalunke2728@gmail.com"><i class="fa fa-envelope"></i></a>
+                    <a href="https://www.linkedin.com/in/komalsaulunke/22311095"><i class="fa fa-linkedin"></i></a>
+                    <a href="https://github.com/komalsalunke1234"><i class="fa fa-github"></i></a>
+                </div>
+            </div>
+        </div>
+        <!-- Card 3 -->
+        <div class="card">
+            <div class="content">
+                <div class="imgBx">
+                    <img src="{{ url_for('static',filename='img/vivek.jpeg') }}">
+                </div>
+                <div class="contentBx">
+                    <h4>Vivek Khaski </h4>
+                </div>
+                <div class="sci">
+                    <a href="#"><i class="fa fa-envelope"></i></a>
+                    <a href="#"><i class="fa fa-linkedin"></i></a>
+                    <a href="#"><i class="fa fa-github"></i></a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
     <footer>
         <div class="copyright">
-            <small>Copyright &copy; 2022 - Resume Parser. All Rights Reserved</small>
+            <small>Copyright &copy; Machine learning TY-project - Resume Parser. All Rights Reserved</small>
         </div>
     </footer>
     <script src="" async defer></script>

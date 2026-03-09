@@ -239,6 +239,18 @@ tr:nth-child(even) {
   z-index: -2;
 }
 
+
+.team .container{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:30px;
+    flex-wrap:wrap;
+}
+
+.team .card{
+    width:300px;
+}
 .container {
   display: flex;
   justify-content: center;

@@ -15,27 +15,46 @@ from __future__ import division
 
 import re
 import os
-from tika import parser
-import spacy
-from spacy.matcher import Matcher
-from spacy.matcher import PhraseMatcher
+import docx2txt
+import pdfplumber
+try:
+    import spacy
+    from spacy.matcher import Matcher
+    from spacy.matcher import PhraseMatcher
+except ModuleNotFoundError:
+    spacy = None
+    Matcher = None
+    PhraseMatcher = None
+
+try:
+    from tika import parser as tika_parser
+except ModuleNotFoundError:
+    tika_parser = None
 
 
 # load pre-trained model
-# base_path = os.path.dirname(__file__)
-base_path = r'resume_screening'
+base_path = os.path.dirname(__file__)
 
-nlp = spacy.load('en_core_web_sm')
+if spacy is not None:
+    try:
+        nlp = spacy.load('en_core_web_sm')
+    except OSError:
+        # Fallback keeps app importable when the model is not present yet.
+        nlp = spacy.blank('en')
 
-# initialize matcher with a vocab
-matcher = Matcher(nlp.vocab)
+    # initialize matcher with a vocab
+    matcher = Matcher(nlp.vocab)
 
-file = os.path.join(base_path,"LINKEDIN_SKILLS_ORIGINAL.txt")
-file = open(file, "r", encoding='utf-8')    
-skill = [line.strip().lower() for line in file]
-skillsmatcher = PhraseMatcher(nlp.vocab)
-patterns = [nlp.make_doc(text) for text in skill if len(nlp.make_doc(text)) < 10]
-skillsmatcher.add("Job title", None, *patterns)
+    file = os.path.join(base_path, "LINKEDIN_SKILLS_ORIGINAL.txt")
+    file = open(file, "r", encoding='utf-8')
+    skill = [line.strip().lower() for line in file]
+    skillsmatcher = PhraseMatcher(nlp.vocab)
+    patterns = [nlp.make_doc(text) for text in skill if len(nlp.make_doc(text)) < 10]
+    skillsmatcher.add("Job title", None, *patterns)
+else:
+    nlp = None
+    matcher = None
+    skillsmatcher = None
 skills_header = (
         'credentials',
         'areas of experience',
@@ -60,15 +79,31 @@ skills_header = (
         'competencies')
 
 def convert_docx_to_txt(docx_file):
-    text = parser.from_file(docx_file, service='text')['content']
+    text = docx2txt.process(docx_file) or ""
+    if not text and tika_parser is not None:
+        text = (tika_parser.from_file(docx_file, service='text') or {}).get('content') or ""
     clean_text = re.sub(r'\n+', '\n', text)
     clean_text = clean_text.replace("\r", "\n").replace("\t", " ")  # Normalize text blob
     resume_lines = clean_text.splitlines()  # Split text blob into individual lines
-    resume_lines = [re.sub('\s+', ' ', line.strip()) for line in resume_lines if line.strip()]  # Remove empty strings and whitespaces
+    resume_lines = [re.sub(r'\s+', ' ', line.strip()) for line in resume_lines if line.strip()]  # Remove empty strings and whitespaces
     return resume_lines
 
 def convert_pdf_to_txt(pdf_file):
-    raw_text = parser.from_file(pdf_file, service='text')['content']
+    pages_text = []
+    try:
+        with pdfplumber.open(pdf_file) as pdf:
+            for page in pdf.pages:
+                pages_text.append(page.extract_text() or "")
+    except Exception:
+        pages_text = []
+
+    raw_text = "\n".join(pages_text).strip()
+    if not raw_text and tika_parser is not None:
+        raw_text = (tika_parser.from_file(pdf_file, service='text') or {}).get('content') or ""
+
+    if not raw_text:
+        return []
+
     full_string = re.sub(r'\n+', '\n', raw_text)
     full_string = full_string.replace("\r", "\n")
     full_string = full_string.replace("\t", " ")
@@ -82,7 +117,7 @@ def convert_pdf_to_txt(pdf_file):
     resume_lines = full_string.splitlines(True)
 
     # Remove empty strings and whitespaces
-    resume_lines = [re.sub('\s+', ' ', line.strip()) for line in resume_lines if line.strip()]
+    resume_lines = [re.sub(r'\s+', ' ', line.strip()) for line in resume_lines if line.strip()]
     return resume_lines
 
 def find_segment_indices(string_to_search, resume_segments, resume_indices):
@@ -120,6 +155,8 @@ def segment(string_to_search):
 
 
 def extract_skills(text):
+    if nlp is None or skillsmatcher is None:
+        return []
     skills = []
     __nlp = nlp(text.lower())
     # Only run nlp.make_doc to speed things up
@@ -131,10 +168,9 @@ def extract_skills(text):
     return skills
 
 def read_file(file):
-    docx_parser = "tika"
     file = os.path.join(file)
     if file.endswith('docx') or file.endswith('doc'):
-        resume_lines = convert_docx_to_txt(file,docx_parser)
+        resume_lines = convert_docx_to_txt(file)
     elif file.endswith('pdf'):
         resume_lines = convert_pdf_to_txt(file)
     else:
@@ -152,7 +188,3 @@ def read_file(file):
     return {
             "skills": skills,
     }
-
-data = read_file(r'instance\resume_files\CV.pdf')
-abc = ' '.join(word for word in data['skills'])
-print(abc)

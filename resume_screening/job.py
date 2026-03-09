@@ -1,19 +1,15 @@
 import os
 import pandas as pd
-import resparser, match
+from . import resparser, match
 import nltk
 from nltk.corpus import stopwords
-import indeed_web_scraping_using_bs4
+from . import indeed_web_scraping_using_bs4
 
-nltk.download('punkt')
-nltk.download('averaged_perceptron_tagger')
-nltk.download('universal_tagset')
-nltk.download('maxent_ne_chunker')
-nltk.download('stopwords')
-nltk.download('wordnet')
-nltk.download('brown')
-
-stopw  = set(stopwords.words('english'))
+try:
+    stopw = set(stopwords.words('english'))
+except LookupError:
+    nltk.download('stopwords', quiet=True)
+    stopw = set(stopwords.words('english'))
 
 def find_sort_job(f):
     job = pd.read_csv(r'indeed_data.csv')
@@ -38,9 +34,8 @@ def find_sort_job(f):
 
 
 def find_sort_resume(f,link):
-    os.chdir(f)
     dic = {}
-    for file in os.listdir():
+    for file in os.listdir(f):
         lsr = []
         file_path = f"{f}\\{file}"
         if file.endswith(".pdf"):
@@ -70,7 +65,3 @@ def find_sort_resume(f,link):
     result_cosine = result_cosine.sort_values('Skills Match', ascending=False).reset_index(drop=True).head(20)
     result_cosine = result_cosine[['Resume Title', 'Skills Match', 'link']]
     return result_cosine
-
-    
-abc = find_sort_job(r'instance\resume_files\CV2.pdf')
-print(abc)
