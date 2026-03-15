@@ -19,7 +19,33 @@ To install and run the Resume and Job Recommendation System, follow these steps:
 2. Navigate to the project directory: `cd resume-job-recommendation`
 3. Install the dependencies: `pip install -r requirements.txt`
 4. Start the Flask server: `python app.py`
-5. Access the system in your browser at `http://localhost:8000`.
+5. Access the system in your browser at `http://localhost:5000`.
+
+## Run with Docker
+
+Use these steps to build and run the project with Docker:
+
+1. Build image:
+	- `docker build -t resume-app .`
+2. Run container:
+	- `docker run --name resume-app -p 5000:5000 resume-app`
+3. Open in browser:
+	- `http://localhost:5000`
+4. Stop container:
+	- `docker stop resume-app`
+5. Remove container (optional):
+	- `docker rm resume-app`
+
+## Run with Docker Compose
+
+1. Start app:
+	- `docker compose up --build`
+2. Open in browser:
+	- `http://localhost:5000`
+3. Stop app:
+	- `Ctrl + C`
+4. Remove containers and network:
+	- `docker compose down`
 
 ## Usage
 

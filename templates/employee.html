@@ -27,6 +27,9 @@
     </header>
     <center>
         <h1 class="title"> Upload Your Resume/CV</h1>
+        {% if error_message %}
+        <p style="color: #c62828; font-family: Montserrat, sans-serif;">{{ error_message }}</p>
+        {% endif %}
         <form method="POST" action="/employee_submit" enctype="multipart/form-data">
             <label for="fileUpload" id="upload">
                 <img src="{{ url_for('static',filename='img/file-upload.png') }}" alt="">

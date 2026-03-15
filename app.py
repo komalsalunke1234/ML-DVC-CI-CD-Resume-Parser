@@ -31,6 +31,13 @@ app=Flask(__name__)
 
 os.makedirs(os.path.join(app.instance_path, 'resume_files'), exist_ok=True)
 
+ALLOWED_RESUME_EXTENSIONS = {'.pdf', '.doc', '.docx'}
+
+
+def _is_allowed_resume(filename):
+    _, extension = os.path.splitext(filename.lower())
+    return extension in ALLOWED_RESUME_EXTENSIONS
+
 @app.route('/')
 def index():
     return render_template("index.html")
@@ -51,13 +58,22 @@ def home():
 
 @app.route('/employee_submit',methods=['POST'])
 def employee_submit_data():
-    if request.method == 'POST':        
-        f = request.files['userfile']
-        unique_name = f"{uuid.uuid4().hex}_{f.filename}"
-        saved_path = os.path.join(app.instance_path, 'resume_files', unique_name)
-        f.save(saved_path)
-    else:
+    if request.method != 'POST':
         return render_template('employee.html')
+
+    if 'userfile' not in request.files:
+        return render_template('employee.html', error_message='Please choose a resume file first.')
+
+    f = request.files['userfile']
+    if not f or not f.filename:
+        return render_template('employee.html', error_message='Please choose a resume file first.')
+
+    if not _is_allowed_resume(f.filename):
+        return render_template('employee.html', error_message='Only PDF, DOC, and DOCX files are supported.')
+
+    unique_name = f"{uuid.uuid4().hex}_{f.filename}"
+    saved_path = os.path.join(app.instance_path, 'resume_files', unique_name)
+    f.save(saved_path)
 
     result_cosine = job.find_sort_job(saved_path)
     return render_template('employee.html', column_names=result_cosine.columns.values, row_data=list(result_cosine.values.tolist()),
@@ -67,10 +83,17 @@ def employee_submit_data():
 def employeer_submit_data():
     if request.method == 'POST':        
         files = request.files.getlist("userfile")
+        if not files:
+            return render_template('employeer.html', error_message='Please choose at least one resume file.')
+
+        valid_files = [file for file in files if file and file.filename and _is_allowed_resume(file.filename)]
+        if not valid_files:
+            return render_template('employeer.html', error_message='Only PDF, DOC, and DOCX files are supported.')
+
         batch_dir = os.path.join(app.instance_path, 'resume_files', f"batch_{uuid.uuid4().hex}")
         os.makedirs(batch_dir, exist_ok=True)
 
-        for file in files:
+        for file in valid_files:
             unique_name = f"{uuid.uuid4().hex}_{file.filename}"
             file.save(os.path.join(batch_dir, unique_name))
 
