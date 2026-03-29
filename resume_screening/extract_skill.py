@@ -188,3 +188,4 @@ def read_file(file):
     return {
             "skills": skills,
     }
+# print(read_file("resume_screening/sample_resumes/sample_resume_1.pdf"))
