@@ -6,16 +6,26 @@ import nltk
 from nltk.corpus import stopwords
 from . import indeed_web_scraping_using_bs4
 
+NLTK_DATA_DIR = os.getenv("NLTK_DATA", "/usr/local/nltk_data")
+if NLTK_DATA_DIR not in nltk.data.path:
+    nltk.data.path.insert(0, NLTK_DATA_DIR)
+
 try:
     stopw = set(stopwords.words('english'))
 except LookupError:
-    nltk.download('stopwords', quiet=True)
+    os.makedirs(NLTK_DATA_DIR, exist_ok=True)
+    nltk.download('stopwords', download_dir=NLTK_DATA_DIR, quiet=True, raise_on_error=True)
     stopw = set(stopwords.words('english'))
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATA_CSV_PATH = PROJECT_ROOT / "data" / "indeed_data.csv"
 
 def find_sort_job(f):
+    if not DATA_CSV_PATH.exists():
+        raise FileNotFoundError(
+            f"Required dataset not found: {DATA_CSV_PATH}. Include data/indeed_data.csv in the image or mount it."
+        )
+
     job = pd.read_csv(DATA_CSV_PATH)
     job['test'] = job['description'].apply(lambda x: ' '.join([word for word in str(x).split() if word not in (stopw)]))
     df = job.drop_duplicates(subset='test').reset_index(drop=True)
@@ -64,8 +74,13 @@ def find_sort_resume(f,link):
     fy['description'] = fy.iloc[:,1].apply(fun)
     fy['description'] = fy['description'].apply(match.preprocessing)
     fy['Resume Title'] = fy['link'].apply(os.path.basename)
-    results = []
-    results.append(indeed_web_scraping_using_bs4.parse_job(link))
+    try:
+        results = [indeed_web_scraping_using_bs4.parse_job(link)]
+    except Exception as exc:
+        raise RuntimeError(
+            "Could not fetch job description from the configured Indeed URL. Update the URL to a valid job posting."
+        ) from exc
+
     clean_job = fun(results[0]['description'])
     clean_job = match.preprocessing(clean_job)
     test_fy = (fy['description'].values.astype('U'))

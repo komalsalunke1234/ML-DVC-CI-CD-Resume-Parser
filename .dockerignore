@@ -1,0 +1,68 @@
+# VCS
+.git
+.gitignore
+.github
+
+# Python cache/virtualenv
+.venv
+venv
+__pycache__
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.ipynb_checkpoints
+
+# Local runtime artifacts
+instance
+*.log
+logs
+tmp
+temp
+.cache
+
+# Data science and notebooks
+notebooks
+*.ipynb
+
+# DVC local state/cache
+.dvc/cache
+.dvc/tmp
+
+# Large datasets and archives
+data/*.csv
+data/*.zip
+data/*.parquet
+data/*.xlsx
+*.csv
+*.tsv
+*.zip
+*.tar
+*.tar.gz
+*.7z
+
+# Model artifacts (keep out of image; mount or download at runtime)
+*.pkl
+*.pickle
+*.joblib
+*.h5
+*.hdf5
+*.onnx
+*.pt
+*.pth
+*.ckpt
+models
+
+# Build and misc
+Dockerfile*
+docker-compose*.yml
+README.md
+ML_MODEL_EXPLANATION.md
+*.md
+
+# Required runtime dataset
+!data/
+!data/indeed_data.csv

@@ -12,15 +12,6 @@ from resume_screening import job
 # nltk.download('wordnet')
 # nltk.download('brown')
 
-from nltk.corpus import stopwords
-import nltk
-
-try:
-    stopw = set(stopwords.words('english'))
-except LookupError:
-    nltk.download('stopwords', quiet=True)
-    stopw = set(stopwords.words('english'))
-
 # jobs = pd.read_csv(r'indeed_data.csv')
 # jobs['test'] = jobs['description'].apply(lambda x: ' '.join([word for word in str(x).split() if word not in (stopw)]))
 # df = jobs.drop_duplicates(subset='test').reset_index(drop=True)
@@ -75,7 +66,11 @@ def employee_submit_data():
     saved_path = os.path.join(app.instance_path, 'resume_files', unique_name)
     f.save(saved_path)
 
-    result_cosine = job.find_sort_job(saved_path)
+    try:
+        result_cosine = job.find_sort_job(saved_path)
+    except Exception as exc:
+        return render_template('employee.html', error_message=f'Unable to process resume: {exc}')
+
     return render_template('employee.html', column_names=result_cosine.columns.values, row_data=list(result_cosine.values.tolist()),
                            link_column="Link", zip=zip)
 
@@ -97,7 +92,11 @@ def employeer_submit_data():
             unique_name = f"{uuid.uuid4().hex}_{file.filename}"
             file.save(os.path.join(batch_dir, unique_name))
 
-        result_cosine = job.find_sort_resume(f=batch_dir, link='https://in.indeed.com/viewjob?jk=56c808776a6c49db&tk=1gbhet5m92ek1000&from=serp&vjs=3')
+        try:
+            result_cosine = job.find_sort_resume(f=batch_dir, link='https://in.indeed.com/viewjob?jk=56c808776a6c49db&tk=1gbhet5m92ek1000&from=serp&vjs=3')
+        except Exception as exc:
+            return render_template('employeer.html', error_message=f'Unable to rank resumes: {exc}')
+
         return render_template('employeer.html', column_names=result_cosine.columns.values, row_data=list(result_cosine.values.tolist()),
                                link_column="link", zip=zip)
     return render_template('employeer.html')
